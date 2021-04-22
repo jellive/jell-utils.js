@@ -10,6 +10,18 @@
     "utils",
     "korean"
   ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint --fix src/**/*.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "test": "jest --config jestconfig.json",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test && yarn lint && yarn lint:fix",
+    "preversion": "yarn lint && yarn lint:fix",
+    "version": "yarn format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "@typescript-eslint/eslint-plugin": "^4.22.0",

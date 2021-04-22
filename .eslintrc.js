@@ -4,7 +4,7 @@
 
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  //   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   //   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended']
   extends: [
@@ -13,10 +13,11 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking'
   ],
-  //   parserOptions: {
-  //     project: './tsconfig.json',
-  //     ecmaVersion: 2018,
-  //     sourceType: 'module'
-  //   },
+  parserOptions: {
+    project: './tsconfig.json',
+    // project: '@typescript-eslint/parser',
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
   ignorePatterns: ['dist/', 'node_modules/']
 }
