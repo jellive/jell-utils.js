@@ -19,5 +19,5 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module'
   },
-  ignorePatterns: ['dist/', 'node_modules/']
+  ignorePatterns: ['dist/', 'node_modules/', '__tests__/']
 }
