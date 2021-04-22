@@ -9,5 +9,8 @@
     "Jell",
     "utils",
     "korean"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  }
 }
