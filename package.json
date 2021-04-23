@@ -1,6 +1,6 @@
 {
   "name": "jell-utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This is personal used function collection.",
   "main": "dist/jell-util.min.js",
   "author": "Jell <jellive7@gmail.com> (https://blog.jell.kr)",
