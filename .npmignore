@@ -1,4 +1,5 @@
 __tests__
+src
 .github
 .eslintignore
 .eslintrc.js
