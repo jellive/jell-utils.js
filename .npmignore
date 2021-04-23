@@ -1,4 +1,8 @@
-src
+__tests__
+.github
+.eslintignore
+.eslintrc.js
+jestconfig.json
 tsconfig.json
 tslint.json
 .prettierrc
