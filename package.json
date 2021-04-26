@@ -1,6 +1,6 @@
 {
   "name": "jell-utils",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "This is personal used function collection.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -11,6 +11,9 @@
     "utils",
     "korean"
   ],
+  "directories": {
+    "lib": "./lib"
+  },
   "scripts": {
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
