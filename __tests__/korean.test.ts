@@ -1,4 +1,4 @@
-import { isKorean } from '../src'
+import { isKorean } from '../lib'
 
 test('this string is korean', () => {
   expect(isKorean('asdf한글')).toBe(true)
