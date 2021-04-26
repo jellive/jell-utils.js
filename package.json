@@ -1,9 +1,9 @@
 {
   "name": "jell-utils",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "This is personal used function collection.",
   "main": ".lib/index.js",
-  "types": "./lib/index.d.ts",
+  "types": ".lib/index.d.ts",
   "author": "Jell <jellive7@gmail.com> (https://blog.jell.kr)",
   "license": "MIT",
   "keywords": [
