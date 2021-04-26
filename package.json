@@ -1,12 +1,9 @@
 {
   "name": "jell-utils",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "This is personal used function collection.",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "directories": {
-    "lib": "./lib"
-  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Jell <jellive7@gmail.com> (https://blog.jell.kr)",
   "license": "MIT",
   "keywords": [
@@ -35,5 +32,19 @@
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.5",
     "typescript": "^4.2.4"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "\\.test\\.ts$",
+    "moduleFileExtensions": [
+      "ts"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": true
+      }
+    }
   }
 }

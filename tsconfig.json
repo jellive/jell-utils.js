@@ -2,10 +2,14 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    // "typeRoots": ["./@types"], // 보통 types 폴더를 만들어 타입 정의
     "declaration": true, // 타입 정의 파일이 같이 빌드되어서 생성. 패키지를 배포할 때 필수 옵션.
-    "outDir": "./lib",
+    // "declarationDir": "./@types", // declaration을 만들 폴더
+    "outDir": "lib",
     "strict": true,
-    "esModuleInterop": true // 'require'와 'import' 호환
+    "esModuleInterop": true, // 'require'와 'import' 호환
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/__tests__/*"]
