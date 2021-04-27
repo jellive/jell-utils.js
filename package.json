@@ -12,7 +12,10 @@
     "korean"
   ],
   "directories": {
-    "lib": "./lib"
+    "lib": "./lib",
+    "//": [
+      "lib 폴더를 지정해서 다른 프로젝트에서 참조할 때 쓴다."
+    ]
   },
   "scripts": {
     "build": "tsc",
