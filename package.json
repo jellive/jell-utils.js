@@ -1,6 +1,6 @@
 {
   "name": "jell-utils",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "This is personal used function collection.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
