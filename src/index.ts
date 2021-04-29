@@ -287,4 +287,4 @@ const util = {
     return true
   }
 }
-export { util }
+export default util
