@@ -1,6 +1,6 @@
 {
   "name": "jell-utils",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "This is personal used function collection.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -12,10 +12,7 @@
     "korean"
   ],
   "directories": {
-    "lib": "./lib",
-    "//": [
-      "lib 폴더를 지정해서 다른 프로젝트에서 참조할 때 쓴다."
-    ]
+    "lib": "./lib"
   },
   "scripts": {
     "build": "tsc",
