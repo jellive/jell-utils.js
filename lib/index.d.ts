@@ -107,5 +107,10 @@ declare const util: {
      * @returns
      */
     equalArrays: (a: unknown[], b: unknown[]) => boolean;
+    /**
+     * @description check iOS device client with user agent.
+     * @returns client is iOS?
+     */
+    isiOS: () => boolean;
 };
 export default util;
