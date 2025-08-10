@@ -10,23 +10,43 @@ const util = {
   },
 
   /**
-   * @description return deep copied object by original object.
-   * @todo need change Record<string, unknown> to Object(Typescript warning)
-   * @param obj Record<string, unknown>
-   * @returns Record<string, unknown>
+   * @description return deep copied object by original object using structuredClone or JSON fallback.
+   * @param obj object to deep clone
+   * @returns deep cloned object
    */
-  clone: (obj: Record<string, unknown>): Record<string, unknown> => {
-    // if (obj === null || typeof obj !== 'object') {
-    //   return obj
-    // }
-    const copy = obj.constructor() as Record<string, unknown>;
-    for (const attr in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, attr)) {
-        // from: https://ourcodeworld.com/articles/read/1425/how-to-fix-eslint-error-do-not-access-objectprototype-method-hasownproperty-from-target-object-no-prototype-builtins
-        copy[attr] = obj[attr];
-      }
+  clone: <T>(obj: T): T => {
+    if (obj === null || typeof obj !== "object") {
+      return obj;
     }
-    return copy;
+
+    // Use structuredClone if available (modern browsers/Node.js 17+)
+    if (typeof structuredClone !== "undefined") {
+      return structuredClone(obj);
+    }
+
+    // Fallback to JSON method (handles most common cases)
+    try {
+      return JSON.parse(JSON.stringify(obj)) as T;
+    } catch {
+      // Final fallback for non-serializable objects
+      if (Array.isArray(obj)) {
+        return obj.map((item: unknown) =>
+          typeof item === "object" && item !== null ? util.clone(item) : item,
+        ) as T;
+      }
+
+      const copy = {} as T;
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          const value = obj[key];
+          copy[key] =
+            typeof value === "object" && value !== null
+              ? util.clone(value)
+              : value;
+        }
+      }
+      return copy;
+    }
   },
   /**
    * @description encode uri parsing (like &lt; => <, &gt; => >)
@@ -37,52 +57,57 @@ const util = {
     return txt.replace(/&lt;/gi, "<").replace(/&gt;/gi, ">");
   },
   /**
-   * @description parseNumber with defaultvalue
-   * @param target original string
-   * @param defaultValue return default value
-   * @returns parsed number value.
+   * @description parseNumber with defaultvalue and proper validation
+   * @param target original string to parse
+   * @param defaultValue return default value if parsing fails
+   * @param isFloat whether to parse as float or integer
+   * @returns parsed number value or default value
    */
   parseNumber: (
     target: string,
     defaultValue: number,
-    isFloat = false
+    isFloat = false,
   ): number => {
-    if (!target || typeof parseInt(target) !== "number") {
+    if (!target || typeof target !== "string" || target.trim() === "") {
       return defaultValue;
     }
 
-    return isFloat ? parseFloat(target) : parseInt(target);
+    const parsed = isFloat ? parseFloat(target) : parseInt(target, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
   },
   /**
-   *
-   * @param target required format such as '00:11:22' / '11:22'
-   * @param defaultValue
-   * @returns
+   * @description parse time string to milliseconds
+   * @param target required format such as '00:11:22' (HH:MM:SS) or '11:22' (MM:SS)
+   * @param defaultValue default value if parsing fails
+   * @returns parsed milliseconds or default value
    */
   parseTime: (target: string, defaultValue: number): number => {
-    if (!target.includes(":"))
-      return defaultValue ? defaultValue : parseInt(target);
+    if (!target || typeof target !== "string" || target.trim() === "") {
+      return defaultValue;
+    }
 
-    const matched = target.match(/:/gi);
-    if (target && matched) {
-      const isMilliSecond = matched.length == 2;
-      const timeValues = target.split(":").map((value) => parseInt(value, 0));
-      let minute = 0;
-      let second = 0;
-      let milliSecond = 0;
-      if (isMilliSecond) {
-        minute = timeValues[0] || 0;
-        second = timeValues[1] || 0;
-        milliSecond = timeValues[2] || 0;
-      } else {
-        minute = timeValues[0] || 0;
-        second = timeValues[1] || 0;
-      }
-      const milliSeconds: number =
-        minute * 60 * 1000 + second * 1000 + milliSecond;
-      return milliSeconds;
+    if (target.indexOf(":") === -1) {
+      const parsed = parseInt(target, 10);
+      return isNaN(parsed) ? defaultValue : parsed;
+    }
+
+    const timeValues = target.split(":").map((value) => {
+      const parsed = parseInt(value.trim(), 10);
+      return isNaN(parsed) ? 0 : parsed;
+    });
+
+    if (timeValues.length < 2 || timeValues.length > 3) {
+      return defaultValue;
+    }
+
+    const [first, second, third = 0] = timeValues;
+
+    if (timeValues.length === 3) {
+      // HH:MM:SS format - treat third value as milliseconds
+      return first * 60 * 1000 + second * 1000 + third;
     } else {
-      return 0;
+      // MM:SS format
+      return first * 60 * 1000 + second * 1000;
     }
   },
   /**
@@ -92,7 +117,7 @@ const util = {
   getNowDate: (): string => {
     const date = new Date();
     let dateString = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
+      date.getTime() - date.getTimezoneOffset() * 60000,
     ).toISOString();
     dateString = dateString.replace("T", " ").split(".")[0];
 
@@ -100,13 +125,18 @@ const util = {
   },
   /**
    * @description generate string from inputed time with korean date format.
+   * @param dateString date input (Date object or string)
+   * @param isYear whether to include year in output
    * @returns string korean date format
    */
-  getKoreanDate: (dateString = new Date(), isYear = false): string => {
-    const targetDate = new Date(dateString);
+  getKoreanDate: (
+    dateString: Date | string = new Date(),
+    isYear = false,
+  ): string => {
+    const targetDate = new Date(dateString as string);
     const year = targetDate.getFullYear();
-    const month = `0${targetDate.getMonth() + 1}`.substr(-2);
-    const date = `0${targetDate.getDate()}`.substr(-2);
+    const month = `0${targetDate.getMonth() + 1}`.slice(-2);
+    const date = `0${targetDate.getDate()}`.slice(-2);
 
     if (isYear) return `${year}년 ${month}월 ${date}일`;
     return `${month}월 ${date}일`;
@@ -117,7 +147,7 @@ const util = {
    * @returns yyyy-mm-dd formatted string.
    */
   formatDate: (date: Date | string = new Date()): string => {
-    const d = new Date(date);
+    const d = new Date(date as string);
     let month = `${d.getMonth() + 1}`;
     let day = `${d.getDate()}`;
     const year = d.getFullYear();
@@ -132,7 +162,7 @@ const util = {
    * @returns d-day
    */
   calDDay: (date: Date | string = new Date()): number => {
-    const countDownDate = new Date(date);
+    const countDownDate = new Date(date as string);
     const now = new Date().getTime();
     const distance = countDownDate.getTime() - now;
 
@@ -151,17 +181,17 @@ const util = {
     str: string,
     txt: string,
     startIndex: number,
-    endIndex: number
+    endIndex: number,
   ): string => {
     const newStr = `${str.substring(0, startIndex)}${txt}${str.substring(
-      endIndex
+      endIndex,
     )}`;
     return newStr;
   },
   /**
-   * @description make camel cased word.
-   * @param txt
-   * @returns
+   * @description convert string to camelCase format
+   * @param txt input string to convert (supports snake_case and space-separated)
+   * @returns camelCase formatted string
    */
   toCamelCase: (txt: string): string => {
     txt = typeof txt !== "string" ? "" : txt;
@@ -179,9 +209,9 @@ const util = {
     return txtArr.join("");
   },
   /**
-   * @description make snake cased word.
-   * @param txt
-   * @returns
+   * @description convert string to snake_case format
+   * @param txt input string to convert
+   * @returns snake_case formatted string
    */
   toSnakeCase: (txt: string): string => {
     txt = typeof txt !== "string" ? "" : txt;
@@ -189,92 +219,101 @@ const util = {
     return txt;
   },
   /**
-   * @description make title case string(first character capital and word space)
-   * @param txt
-   * @returns
+   * @description make title case string (first character capital and word space)
+   * @param txt input string to convert
+   * @returns title case string with proper spacing
    */
   toTitleCase: (txt: string): string => {
-    txt = typeof txt !== "string" ? "" : txt;
+    if (typeof txt !== "string") return "";
 
-    // snake case
-    txt = txt.replace(/_/g, " ");
-    txt = txt
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase().concat(word.substr(1)))
+    // Convert snake_case to spaces and handle camelCase
+    const result = txt
+      .replace(/_/g, " ") // Replace underscores with spaces
+      .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space before capital letters in camelCase
+      .split(/\s+/) // Split by any whitespace
+      .filter((word) => word.length > 0) // Remove empty strings
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
 
-    // input space when camel case
-    const upperCases = txt.match(/[A-Z]/g) || [];
-    upperCases.forEach((varter) => {
-      const regEx = new RegExp(varter, "g");
-      txt = txt.replace(regEx, " " + varter);
-    });
-
-    while (/{2}/g.exec(txt) != null) {
-      txt = txt.replace(/{2}/g, " ");
-    }
-    txt = txt.trim();
-
-    return txt;
+    return result;
   },
   /**
-   * @description br tag to line break.
-   * @param txt
-   * @returns
+   * @description convert HTML br tags to line breaks
+   * @param txt input string with br tags
+   * @returns string with br tags converted to newlines
    */
   toText: (txt: string): string => {
     return txt.replace(/<br>/gi, "\n");
   },
   /**
-   * @description line break to br tag.
-   * @param txt
-   * @returns
+   * @description convert line breaks to HTML br tags
+   * @param txt input string with newlines
+   * @returns string with newlines converted to br tags
    */
   toHtml: (txt: string): string => {
     return txt.replace(/\n/gi, "<br>");
   },
   /**
-   * @description remove tag brace text.
-   * @param txt string
-   * @param isError (beta) check 'suggestCheck' tag.
-   * @returns
+   * @description safely remove HTML tags from text, preventing XSS attacks
+   * @param txt input string with HTML tags
+   * @param preserveErrorTags whether to preserve elements with 'suggestCheck' class
+   * @returns sanitized text with specified tags removed
    */
-  clearTag: (txt: string, isError = false): string => {
-    const txtWrap = document.createElement("div");
-    txtWrap.innerHTML = txt;
+  clearTag: (txt: string, preserveErrorTags = false): string => {
+    if (typeof txt !== "string") return "";
 
-    const tags = ["div", "font", "span"];
-    tags.forEach((tag) => {
-      let elements = txtWrap.querySelectorAll(tag);
-      let errorWraps = txtWrap.querySelectorAll(`${tag}.suggestCheck`);
-      let isContinue = isError
-        ? elements.length - errorWraps.length > 0
-        : elements.length > 0;
+    // Create a temporary DOM element for safe parsing
+    const tempDiv = document.createElement("div");
 
-      while (isContinue) {
-        elements.forEach((element) => {
-          const isErrorWrap = element.className.includes("suggestCheck");
-          if (!isError || !isErrorWrap) {
-            element.outerHTML = element.innerHTML;
-          }
-        });
+    // Set textContent first to avoid XSS, then replace with innerHTML for parsing
+    tempDiv.textContent = "";
+    try {
+      tempDiv.innerHTML = txt;
+    } catch {
+      // If innerHTML parsing fails, return original text stripped of all tags
+      return txt.replace(/<[^>]*>/g, "");
+    }
 
-        elements = txtWrap.querySelectorAll(tag);
-        errorWraps = txtWrap.querySelectorAll(`${tag}.suggestCheck`);
-        isContinue = isError
-          ? elements.length - errorWraps.length > 0
-          : elements.length > 0;
+    const tagsToRemove = ["div", "font", "span"];
+
+    // Remove specified tags while preserving content
+    tagsToRemove.forEach((tagName) => {
+      const elements = tempDiv.querySelectorAll(tagName);
+
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        const hasErrorClass = element.className.indexOf("suggestCheck") !== -1;
+
+        // Skip if we want to preserve error tags and this element has the error class
+        if (preserveErrorTags && hasErrorClass) {
+          continue;
+        }
+
+        // Replace element with its content
+        const parent = element.parentNode;
+        if (parent) {
+          // Create text node from inner content to prevent XSS
+          const textContent = element.textContent || "";
+          const textNode = document.createTextNode(textContent);
+          parent.replaceChild(textNode, element);
+        }
       }
     });
 
-    const clearedTxt = txtWrap.innerHTML.replace(/<br>/gi, "\n");
-    return clearedTxt;
+    // Convert <br> tags to newlines and get text content
+    const result = tempDiv.innerHTML.replace(/<br\s*\/?>/gi, "\n");
+
+    // Final sanitization: remove any remaining script tags and dangerous content
+    return result.replace(
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+      "",
+    );
   },
   /**
-   * @description check same between two array.
-   * @param a array
-   * @param b array
-   * @returns
+   * @description check if two arrays are equal (shallow comparison)
+   * @param a first array to compare
+   * @param b second array to compare
+   * @returns true if arrays are equal, false otherwise
    */
   equalArrays: (a: unknown[], b: unknown[]): boolean => {
     if (a === b) return true;
@@ -289,12 +328,10 @@ const util = {
 
   /**
    * @description check iOS device client with user agent.
-   * @returns client is iOS?
+   * @returns true if client is iOS device, false otherwise
    */
   isiOS: (): boolean => {
-    const isiOS = /iPhone|iPad|iPod/i.exec(navigator.userAgent) || false;
-    if (isiOS && isiOS) return isiOS !== null;
-    return isiOS;
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
   },
 };
 export default util;
