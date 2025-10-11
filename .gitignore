@@ -144,6 +144,7 @@ jestconfig.json
 CLAUDE.md
 
 TEST*.md
+NPM_DEPLOYMENT_GUIDE.md
 
 .npmrc
 
