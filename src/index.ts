@@ -364,18 +364,18 @@ const util = {
    * @param defaultValue default value if path not found
    * @returns value at path or default value
    */
-  getByPath: <T = any>(obj: any, path: string, defaultValue?: T): T => {
+  getByPath: <T = unknown>(obj: Record<string, unknown>, path: string, defaultValue?: T): T => {
     const keys = path.split('.')
-    let result = obj
-
+    let result: unknown = obj
+    
     for (const key of keys) {
       if (result === null || result === undefined) {
         return defaultValue as T
       }
-      result = result[key]
+      result = (result as Record<string, unknown>)[key]
     }
-
-    return result === undefined ? (defaultValue as T) : result
+    
+    return result === undefined ? (defaultValue as T) : (result as T)
   },
 
   /**
@@ -384,20 +384,20 @@ const util = {
    * @param path path string (e.g., 'user.profile.name')
    * @param value value to set
    */
-  setByPath: (obj: any, path: string, value: any): void => {
+  setByPath: (obj: Record<string, unknown>, path: string, value: unknown): void => {
     const keys = path.split('.')
     const lastKey = keys.pop()
-
+    
     if (!lastKey) return
-
-    let current = obj
+    
+    let current: Record<string, unknown> = obj
     for (const key of keys) {
       if (!(key in current) || typeof current[key] !== 'object') {
         current[key] = {}
       }
-      current = current[key]
+      current = current[key] as Record<string, unknown>
     }
-
+    
     current[lastKey] = value
   },
 
@@ -407,7 +407,7 @@ const util = {
    * @param key key to group by
    * @returns grouped object
    */
-  groupBy: <T extends Record<string, any>>(
+  groupBy: <T extends Record<string, unknown>>(
     array: T[],
     key: keyof T
   ): Record<string, T[]> => {
@@ -471,7 +471,7 @@ const util = {
    * @param source source object
    * @returns merged object
    */
-  deepMerge: <T extends Record<string, any>>(
+  deepMerge: <T extends Record<string, unknown>>(
     target: T,
     source: Partial<T>
   ): T => {
@@ -490,9 +490,12 @@ const util = {
           typeof targetValue === 'object' &&
           !Array.isArray(targetValue)
         ) {
-          result[key] = util.deepMerge(targetValue, sourceValue) as any
+          result[key] = util.deepMerge(
+            targetValue as Record<string, unknown>, 
+            sourceValue as Partial<Record<string, unknown>>
+          ) as T[Extract<keyof T, string>]
         } else {
-          result[key] = sourceValue as any
+          result[key] = sourceValue as T[Extract<keyof T, string>]
         }
       }
     }
@@ -579,7 +582,7 @@ const util = {
    * @param order sort order ('asc' or 'desc')
    * @returns sorted array
    */
-  sortBy: <T extends Record<string, any>>(
+  sortBy: <T extends Record<string, unknown>>(
     array: T[],
     key: keyof T,
     order: 'asc' | 'desc' = 'asc'
@@ -599,9 +602,9 @@ const util = {
    * @param obj object to convert
    * @returns query string (e.g., 'key1=value1&key2=value2')
    */
-  objectToQueryString: (obj: Record<string, any>): string => {
+  objectToQueryString: (obj: Record<string, unknown>): string => {
     return Object.entries(obj)
-      .filter(([_, value]) => value !== undefined && value !== null)
+      .filter(([, value]) => value !== undefined && value !== null)
       .map(
         ([key, value]) =>
           `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`

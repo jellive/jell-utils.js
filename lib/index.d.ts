@@ -127,21 +127,21 @@ declare const util: {
      * @param defaultValue default value if path not found
      * @returns value at path or default value
      */
-    getByPath: <T = any>(obj: any, path: string, defaultValue?: T) => T;
+    getByPath: <T = unknown>(obj: Record<string, unknown>, path: string, defaultValue?: T) => T;
     /**
      * @description set nested object value by path string
      * @param obj target object
      * @param path path string (e.g., 'user.profile.name')
      * @param value value to set
      */
-    setByPath: (obj: any, path: string, value: any) => void;
+    setByPath: (obj: Record<string, unknown>, path: string, value: unknown) => void;
     /**
      * @description group array of objects by key
      * @param array array to group
      * @param key key to group by
      * @returns grouped object
      */
-    groupBy: <T extends Record<string, any>>(array: T[], key: keyof T) => Record<string, T[]>;
+    groupBy: <T extends Record<string, unknown>>(array: T[], key: keyof T) => Record<string, T[]>;
     /**
      * @description extract only numbers from string
      * @param str input string
@@ -172,7 +172,7 @@ declare const util: {
      * @param source source object
      * @returns merged object
      */
-    deepMerge: <T extends Record<string, any>>(target: T, source: Partial<T>) => T;
+    deepMerge: <T extends Record<string, unknown>>(target: T, source: Partial<T>) => T;
     /**
      * @description retry async function with exponential backoff
      * @param fn async function to retry
@@ -195,13 +195,13 @@ declare const util: {
      * @param order sort order ('asc' or 'desc')
      * @returns sorted array
      */
-    sortBy: <T extends Record<string, any>>(array: T[], key: keyof T, order?: "asc" | "desc") => T[];
+    sortBy: <T extends Record<string, unknown>>(array: T[], key: keyof T, order?: "asc" | "desc") => T[];
     /**
      * @description convert object to URL query string
      * @param obj object to convert
      * @returns query string (e.g., 'key1=value1&key2=value2')
      */
-    objectToQueryString: (obj: Record<string, any>) => string;
+    objectToQueryString: (obj: Record<string, unknown>) => string;
     /**
      * @description mask sensitive string (e.g., credit card, phone)
      * @param str string to mask
