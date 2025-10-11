@@ -131,7 +131,20 @@ temp/
 # typescript compile
 # build
 # lib
+# src
 
+# jest
+jestconfig.json
+
+# prettier
+.prettierrc
+.prettierignore
+
+# claude
 CLAUDE.md
+
+TEST*.md
+
+.npmrc
 
 # End of https://www.toptal.com/developers/gitignore/api/node
