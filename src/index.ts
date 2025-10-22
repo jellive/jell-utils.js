@@ -364,17 +364,21 @@ const util = {
    * @param defaultValue default value if path not found
    * @returns value at path or default value
    */
-  getByPath: <T = unknown>(obj: Record<string, unknown>, path: string, defaultValue?: T): T => {
+  getByPath: <T = unknown>(
+    obj: Record<string, unknown>,
+    path: string,
+    defaultValue?: T
+  ): T => {
     const keys = path.split('.')
     let result: unknown = obj
-    
+
     for (const key of keys) {
       if (result === null || result === undefined) {
         return defaultValue as T
       }
       result = (result as Record<string, unknown>)[key]
     }
-    
+
     return result === undefined ? (defaultValue as T) : (result as T)
   },
 
@@ -384,12 +388,16 @@ const util = {
    * @param path path string (e.g., 'user.profile.name')
    * @param value value to set
    */
-  setByPath: (obj: Record<string, unknown>, path: string, value: unknown): void => {
+  setByPath: (
+    obj: Record<string, unknown>,
+    path: string,
+    value: unknown
+  ): void => {
     const keys = path.split('.')
     const lastKey = keys.pop()
-    
+
     if (!lastKey) return
-    
+
     let current: Record<string, unknown> = obj
     for (const key of keys) {
       if (!(key in current) || typeof current[key] !== 'object') {
@@ -397,7 +405,7 @@ const util = {
       }
       current = current[key] as Record<string, unknown>
     }
-    
+
     current[lastKey] = value
   },
 
@@ -491,7 +499,7 @@ const util = {
           !Array.isArray(targetValue)
         ) {
           result[key] = util.deepMerge(
-            targetValue as Record<string, unknown>, 
+            targetValue as Record<string, unknown>,
             sourceValue as Partial<Record<string, unknown>>
           ) as T[Extract<keyof T, string>]
         } else {
