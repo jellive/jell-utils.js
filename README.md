@@ -3,10 +3,10 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Node.js Version][node-version-image]][node-version-url]
-
-<!-- [![Build status][travis-image]][travis-url] -->
-
-[![Test coverage][coveralls-image]][coveralls-url]
+[![CI Status][ci-image]][ci-url]
+[![License][license-image]][license-url]
+[![TypeScript][typescript-image]][typescript-url]
+[![Bundle Size][bundlephobia-image]][bundlephobia-url]
 
 This is personal project.
 
@@ -571,11 +571,13 @@ const date = util.getKoreanDate() // string
 [npm-url]: https://npmjs.org/package/jell-utils
 [node-version-image]: https://img.shields.io/node/v/jell-utils.svg
 [node-version-url]: https://nodejs.org/en/download/
-
-<!-- [travis-image]: https://img.shields.io/travis/jellive/jell-utils/master.svg
-[travis-url]: https://travis-ci.org/jellive/jell-utils -->
-
-[coveralls-image]: https://img.shields.io/coveralls/jellive/jell-utils/master.svg
-[coveralls-url]: https://coveralls.io/r/jellive/jell-utils?branch=master
 [downloads-image]: https://img.shields.io/npm/dm/jell-utils.svg
 [downloads-url]: https://npmjs.org/package/jell-utils
+[ci-image]: https://github.com/jellive/jell-utils.js/actions/workflows/ci.yml/badge.svg
+[ci-url]: https://github.com/jellive/jell-utils.js/actions/workflows/ci.yml
+[license-image]: https://img.shields.io/npm/l/jell-utils.svg
+[license-url]: https://github.com/jellive/jell-utils.js/blob/master/LICENSE
+[typescript-image]: https://img.shields.io/badge/TypeScript-Ready-blue.svg
+[typescript-url]: https://www.typescriptlang.org/
+[bundlephobia-image]: https://img.shields.io/bundlephobia/minzip/jell-utils
+[bundlephobia-url]: https://bundlephobia.com/package/jell-utils
