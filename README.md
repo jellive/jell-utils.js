@@ -121,6 +121,52 @@ util.dateDiff('2024-01-01', '2024-01-02')
 // { days: 1, hours: 0, minutes: 0, seconds: 0 }
 ```
 
+#### `formatDateAdvanced(date: Date | string, format: string): string` 🆕
+
+날짜를 원하는 형식으로 포맷합니다.
+
+```typescript
+util.formatDateAdvanced(new Date(), 'YYYY-MM-DD') // "2025-12-26"
+util.formatDateAdvanced(new Date(), 'YYYY년 MM월 DD일') // "2025년 12월 26일"
+util.formatDateAdvanced(new Date(), 'YYYY/MM/DD HH:mm') // "2025/12/26 14:30"
+util.formatDateAdvanced(new Date(), 'dddd') // "금요일"
+util.formatDateAdvanced(new Date(), 'ddd') // "금"
+```
+
+**지원 토큰**: `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `ddd`, `dddd`
+
+#### `timeAgo(date: Date | string): string` 🆕
+
+상대적 시간을 한국어로 표시합니다.
+
+```typescript
+util.timeAgo(new Date(Date.now() - 30000)) // "방금 전"
+util.timeAgo(new Date(Date.now() - 3600000)) // "1시간 전"
+util.timeAgo(new Date(Date.now() - 86400000)) // "어제"
+util.timeAgo(new Date(Date.now() - 172800000)) // "2일 전"
+```
+
+#### `getDaysInMonth(year: number, month: number): number` 🆕
+
+해당 월의 일수를 반환합니다.
+
+```typescript
+util.getDaysInMonth(2025, 2) // 28 (평년)
+util.getDaysInMonth(2024, 2) // 29 (윤년)
+util.getDaysInMonth(2025, 12) // 31
+```
+
+#### `isLeapYear(year: number): boolean` 🆕
+
+윤년 여부를 확인합니다.
+
+```typescript
+util.isLeapYear(2024) // true
+util.isLeapYear(2025) // false
+util.isLeapYear(2000) // true
+util.isLeapYear(1900) // false
+```
+
 ### 문자열 유틸리티
 
 #### `toCamelCase(txt: string): string`
@@ -236,6 +282,62 @@ util.parseNumber('abc', 0) // 0 (기본값 반환)
 ```typescript
 util.parseTime('01:30', 0) // 90000 (1분 30초 = 90000ms)
 util.parseTime('01:30:45', 0) // 90045 (1분 30초 45ms)
+```
+
+#### `formatNumber(num: number): string` 🆕
+
+천 단위 쉼표 포맷을 적용합니다.
+
+```typescript
+util.formatNumber(1000) // "1,000"
+util.formatNumber(1234567) // "1,234,567"
+util.formatNumber(1234.56) // "1,234.56"
+```
+
+#### `formatCurrency(amount: number, currency?: string): string` 🆕
+
+통화 포맷을 적용합니다 (기본: 원화).
+
+```typescript
+util.formatCurrency(1000) // "1,000원"
+util.formatCurrency(1234567) // "1,234,567원"
+util.formatCurrency(1000, 'USD') // "$1,000"
+util.formatCurrency(1000, 'EUR') // "€1,000"
+util.formatCurrency(1000, 'JPY') // "¥1,000"
+```
+
+#### `formatFileSize(bytes: number, precision?: number): string` 🆕
+
+파일 크기를 읽기 쉬운 형식으로 변환합니다.
+
+```typescript
+util.formatFileSize(1024) // "1 KB"
+util.formatFileSize(1048576) // "1 MB"
+util.formatFileSize(1073741824) // "1 GB"
+util.formatFileSize(1536, 2) // "1.50 KB"
+```
+
+#### `numberToKorean(num: number): string` 🆕
+
+숫자를 한글로 변환합니다.
+
+```typescript
+util.numberToKorean(123) // "백이십삼"
+util.numberToKorean(1234) // "천이백삼십사"
+util.numberToKorean(12345) // "만이천삼백사십오"
+util.numberToKorean(100000000) // "일억"
+util.numberToKorean(0) // "영"
+```
+
+#### `parseNumberFromString(str: string): number` 🆕
+
+문자열에서 숫자를 추출합니다.
+
+```typescript
+util.parseNumberFromString('1,234') // 1234
+util.parseNumberFromString('1,234.56') // 1234.56
+util.parseNumberFromString('$1,000') // 1000
+util.parseNumberFromString('1,000원') // 1000
 ```
 
 ### 객체 유틸리티
@@ -360,6 +462,57 @@ if (util.isiOS()) {
 }
 ```
 
+### 검증 유틸리티 🆕
+
+#### `isEmail(email: string): boolean`
+
+이메일 주소를 검증합니다.
+
+```typescript
+util.isEmail('test@example.com') // true
+util.isEmail('invalid-email') // false
+```
+
+#### `isPhoneNumber(phone: string): boolean`
+
+한국 전화번호를 검증합니다.
+
+```typescript
+util.isPhoneNumber('010-1234-5678') // true
+util.isPhoneNumber('01012345678') // true
+util.isPhoneNumber('02-123-4567') // true (지역번호)
+util.isPhoneNumber('1234-5678') // false
+```
+
+#### `isUrl(url: string): boolean`
+
+URL을 검증합니다.
+
+```typescript
+util.isUrl('https://example.com') // true
+util.isUrl('http://localhost:3000') // true
+util.isUrl('ftp://files.example.com') // true
+util.isUrl('not-a-url') // false
+```
+
+#### `formatPhoneNumber(phone: string): string`
+
+전화번호를 하이픈으로 포맷합니다.
+
+```typescript
+util.formatPhoneNumber('01012345678') // "010-1234-5678"
+util.formatPhoneNumber('0212345678') // "02-1234-5678"
+util.formatPhoneNumber('03112345678') // "031-1234-5678"
+```
+
+#### `formatBusinessNumber(brn: string): string`
+
+사업자등록번호를 포맷합니다.
+
+```typescript
+util.formatBusinessNumber('1234567890') // "123-45-67890"
+```
+
 ## 타입스크립트 지원
 
 이 라이브러리는 TypeScript로 작성되었으며 완전한 타입 정의를 제공합니다.
@@ -373,6 +526,28 @@ const date = util.getKoreanDate() // string
 ```
 
 ## Change log
+
+### v0.2.0 (2025-12-26)
+
+- 🆕 **날짜/시간 유틸리티 추가**
+  - `formatDateAdvanced`: 커스텀 포맷 토큰 지원
+  - `timeAgo`: 한국어 상대 시간 표시
+  - `getDaysInMonth`: 월별 일수 반환
+  - `isLeapYear`: 윤년 확인
+- 🆕 **숫자 포맷 유틸리티 추가**
+  - `formatNumber`: 천 단위 쉼표
+  - `formatCurrency`: 다국어 통화 포맷 (KRW, USD, EUR, JPY, CNY)
+  - `formatFileSize`: 파일 크기 포맷
+  - `numberToKorean`: 숫자를 한글로 변환
+  - `parseNumberFromString`: 문자열에서 숫자 추출
+- 🆕 **검증 유틸리티 추가**
+  - `isEmail`: 이메일 검증
+  - `isPhoneNumber`: 한국 전화번호 검증
+  - `isUrl`: URL 검증
+  - `formatPhoneNumber`: 전화번호 포맷
+  - `formatBusinessNumber`: 사업자등록번호 포맷
+- 📈 테스트 커버리지 개선 (79.67% → 83.16%)
+- 📝 114개 테스트 케이스
 
 ### v0.1.0 (2024)
 

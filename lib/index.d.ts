@@ -211,5 +211,93 @@ declare const util: {
      * @returns masked string
      */
     maskString: (str: string, visibleStart?: number, visibleEnd?: number, maskChar?: string) => string;
+    /**
+     * @description Format date with custom format tokens
+     * @param date Date object or date string
+     * @param format Format string with tokens (YYYY, MM, DD, HH, mm, ss, ddd, dddd)
+     * @returns Formatted date string
+     */
+    formatDateAdvanced: (date: Date | string, format: string) => string;
+    /**
+     * @description Get relative time string in Korean
+     * @param date Date object or date string
+     * @returns Korean relative time string (e.g., '방금 전', '5분 전', '어제')
+     */
+    timeAgo: (date: Date | string) => string;
+    /**
+     * @description Get the number of days in a month
+     * @param year Year (e.g., 2025)
+     * @param month Month (1-12)
+     * @returns Number of days in the month
+     */
+    getDaysInMonth: (year: number, month: number) => number;
+    /**
+     * @description Check if a year is a leap year
+     * @param year Year to check
+     * @returns true if leap year, false otherwise
+     */
+    isLeapYear: (year: number) => boolean;
+    /**
+     * @description Format number with thousand separators
+     * @param num Number to format
+     * @returns Formatted string with commas
+     */
+    formatNumber: (num: number) => string;
+    /**
+     * @description Format number as currency
+     * @param amount Amount to format
+     * @param currency Currency code (KRW, USD, EUR, JPY, CNY)
+     * @returns Formatted currency string
+     */
+    formatCurrency: (amount: number, currency?: "KRW" | "USD" | "EUR" | "JPY" | "CNY") => string;
+    /**
+     * @description Format bytes to human-readable file size
+     * @param bytes Number of bytes
+     * @param precision Decimal precision (default: 0 for B/KB, 2 for larger)
+     * @returns Formatted file size string
+     */
+    formatFileSize: (bytes: number, precision?: number) => string;
+    /**
+     * @description Convert number to Korean words
+     * @param num Number to convert
+     * @returns Korean number string (e.g., '천이백삼십사')
+     */
+    numberToKorean: (num: number) => string;
+    /**
+     * @description Parse number from formatted string
+     * @param str String containing number (with commas, currency symbols, etc.)
+     * @returns Parsed number
+     */
+    parseNumberFromString: (str: string) => number;
+    /**
+     * @description Validate email address
+     * @param email Email address to validate
+     * @returns true if valid email, false otherwise
+     */
+    isEmail: (email: string) => boolean;
+    /**
+     * @description Validate Korean phone number
+     * @param phone Phone number to validate
+     * @returns true if valid Korean phone number, false otherwise
+     */
+    isPhoneNumber: (phone: string) => boolean;
+    /**
+     * @description Validate URL
+     * @param url URL to validate
+     * @returns true if valid URL, false otherwise
+     */
+    isUrl: (url: string) => boolean;
+    /**
+     * @description Format Korean phone number with hyphens
+     * @param phone Phone number to format
+     * @returns Formatted phone number
+     */
+    formatPhoneNumber: (phone: string) => string;
+    /**
+     * @description Format Korean business registration number
+     * @param brn Business registration number
+     * @returns Formatted business number (XXX-XX-XXXXX)
+     */
+    formatBusinessNumber: (brn: string) => string;
 };
 export default util;

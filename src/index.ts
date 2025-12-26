@@ -641,6 +641,305 @@ const util = {
     const masked = maskChar.repeat(str.length - visibleStart - visibleEnd)
 
     return start + masked + end
+  },
+
+  // ==================== Date Utilities (v0.2.0) ====================
+
+  /**
+   * @description Format date with custom format tokens
+   * @param date Date object or date string
+   * @param format Format string with tokens (YYYY, MM, DD, HH, mm, ss, ddd, dddd)
+   * @returns Formatted date string
+   */
+  formatDateAdvanced: (date: Date | string, format: string): string => {
+    const d = new Date(date as string)
+    const weekdays = [
+      '일요일',
+      '월요일',
+      '화요일',
+      '수요일',
+      '목요일',
+      '금요일',
+      '토요일'
+    ]
+
+    const replacements: Record<string, string> = {
+      YYYY: d.getFullYear().toString(),
+      MM: (d.getMonth() + 1).toString().padStart(2, '0'),
+      DD: d.getDate().toString().padStart(2, '0'),
+      HH: d.getHours().toString().padStart(2, '0'),
+      mm: d.getMinutes().toString().padStart(2, '0'),
+      ss: d.getSeconds().toString().padStart(2, '0'),
+      dddd: weekdays[d.getDay()],
+      ddd: weekdays[d.getDay()].charAt(0)
+    }
+
+    let result = format
+    // Replace longer tokens first to avoid partial matches
+    const tokens = ['YYYY', 'dddd', 'ddd', 'MM', 'DD', 'HH', 'mm', 'ss']
+    for (const token of tokens) {
+      result = result.replace(new RegExp(token, 'g'), replacements[token])
+    }
+    return result
+  },
+
+  /**
+   * @description Get relative time string in Korean
+   * @param date Date object or date string
+   * @returns Korean relative time string (e.g., '방금 전', '5분 전', '어제')
+   */
+  timeAgo: (date: Date | string): string => {
+    const now = Date.now()
+    const past = new Date(date as string).getTime()
+    const diff = now - past
+
+    const minute = 60 * 1000
+    const hour = 60 * minute
+    const day = 24 * hour
+    const week = 7 * day
+    const month = 30 * day
+    const year = 365 * day
+
+    if (diff < minute) return '방금 전'
+    if (diff < hour) return `${Math.floor(diff / minute)}분 전`
+    if (diff < day) return `${Math.floor(diff / hour)}시간 전`
+    if (diff < 2 * day) return '어제'
+    if (diff < week) return `${Math.floor(diff / day)}일 전`
+    if (diff < month) return `${Math.floor(diff / week)}주 전`
+    if (diff < year) return `${Math.floor(diff / month)}개월 전`
+    return `${Math.floor(diff / year)}년 전`
+  },
+
+  /**
+   * @description Get the number of days in a month
+   * @param year Year (e.g., 2025)
+   * @param month Month (1-12)
+   * @returns Number of days in the month
+   */
+  getDaysInMonth: (year: number, month: number): number => {
+    return new Date(year, month, 0).getDate()
+  },
+
+  /**
+   * @description Check if a year is a leap year
+   * @param year Year to check
+   * @returns true if leap year, false otherwise
+   */
+  isLeapYear: (year: number): boolean => {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+  },
+
+  // ==================== Number Utilities (v0.2.0) ====================
+
+  /**
+   * @description Format number with thousand separators
+   * @param num Number to format
+   * @returns Formatted string with commas
+   */
+  formatNumber: (num: number): string => {
+    return num.toLocaleString('en-US')
+  },
+
+  /**
+   * @description Format number as currency
+   * @param amount Amount to format
+   * @param currency Currency code (KRW, USD, EUR, JPY, CNY)
+   * @returns Formatted currency string
+   */
+  formatCurrency: (
+    amount: number,
+    currency: 'KRW' | 'USD' | 'EUR' | 'JPY' | 'CNY' = 'KRW'
+  ): string => {
+    const formatted = util.formatNumber(amount)
+
+    const symbols: Record<string, { symbol: string; prefix: boolean }> = {
+      KRW: { symbol: '원', prefix: false },
+      USD: { symbol: '$', prefix: true },
+      EUR: { symbol: '€', prefix: true },
+      JPY: { symbol: '¥', prefix: true },
+      CNY: { symbol: '¥', prefix: true }
+    }
+
+    const { symbol, prefix } = symbols[currency]
+    return prefix ? `${symbol}${formatted}` : `${formatted}${symbol}`
+  },
+
+  /**
+   * @description Format bytes to human-readable file size
+   * @param bytes Number of bytes
+   * @param precision Decimal precision (default: 0 for B/KB, 2 for larger)
+   * @returns Formatted file size string
+   */
+  formatFileSize: (bytes: number, precision?: number): string => {
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    let size = bytes
+    let unitIndex = 0
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024
+      unitIndex++
+    }
+
+    const decimals =
+      precision !== undefined ? precision : unitIndex === 0 ? 0 : 0
+    return `${size.toFixed(decimals)} ${units[unitIndex]}`
+  },
+
+  /**
+   * @description Convert number to Korean words
+   * @param num Number to convert
+   * @returns Korean number string (e.g., '천이백삼십사')
+   */
+  numberToKorean: (num: number): string => {
+    if (num === 0) return '영'
+
+    const digits = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구']
+    const units = ['', '십', '백', '천']
+    const bigUnits = ['', '만', '억', '조']
+
+    const processGroup = (n: number): string => {
+      let result = ''
+      let temp = n
+
+      for (let i = 3; i >= 0; i--) {
+        const digit = Math.floor(temp / Math.pow(10, i))
+        temp %= Math.pow(10, i)
+
+        if (digit > 0) {
+          // Omit '일' before 십, 백, 천 (but not for units[0])
+          if (digit > 1 || i === 0) {
+            result += digits[digit]
+          }
+          result += units[i]
+        }
+      }
+      return result
+    }
+
+    let result = ''
+    let groupIndex = 0
+    let remaining = num
+
+    while (remaining > 0) {
+      const group = remaining % 10000
+      if (group > 0) {
+        const groupStr = processGroup(group)
+        // '만' 단위에서 1은 생략, '억' 이상에서는 '일' 포함
+        if (group === 1 && groupIndex >= 1) {
+          if (groupIndex >= 2) {
+            // 억 이상: '일억', '일조'
+            result = '일' + bigUnits[groupIndex] + result
+          } else {
+            // 만: '만' (일 생략)
+            result = bigUnits[groupIndex] + result
+          }
+        } else {
+          result = groupStr + bigUnits[groupIndex] + result
+        }
+      }
+      remaining = Math.floor(remaining / 10000)
+      groupIndex++
+    }
+
+    return result
+  },
+
+  /**
+   * @description Parse number from formatted string
+   * @param str String containing number (with commas, currency symbols, etc.)
+   * @returns Parsed number
+   */
+  parseNumberFromString: (str: string): number => {
+    const cleaned = str.replace(/[^0-9.-]/g, '')
+    return parseFloat(cleaned)
+  },
+
+  // ==================== Validation Utilities (v0.2.0) ====================
+
+  /**
+   * @description Validate email address
+   * @param email Email address to validate
+   * @returns true if valid email, false otherwise
+   */
+  isEmail: (email: string): boolean => {
+    const emailRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+    return emailRegex.test(email)
+  },
+
+  /**
+   * @description Validate Korean phone number
+   * @param phone Phone number to validate
+   * @returns true if valid Korean phone number, false otherwise
+   */
+  isPhoneNumber: (phone: string): boolean => {
+    const mobileRegex = /^01[016789]-?\d{3,4}-?\d{4}$/
+    const landlineRegex = /^0[2-6][1-5]?-?\d{3,4}-?\d{4}$/
+
+    return mobileRegex.test(phone) || landlineRegex.test(phone)
+  },
+
+  /**
+   * @description Validate URL
+   * @param url URL to validate
+   * @returns true if valid URL, false otherwise
+   */
+  isUrl: (url: string): boolean => {
+    try {
+      const parsed = new URL(url)
+      return ['http:', 'https:', 'ftp:'].includes(parsed.protocol)
+    } catch {
+      return false
+    }
+  },
+
+  /**
+   * @description Format Korean phone number with hyphens
+   * @param phone Phone number to format
+   * @returns Formatted phone number
+   */
+  formatPhoneNumber: (phone: string): string => {
+    const digits = phone.replace(/[^0-9]/g, '')
+
+    if (digits.startsWith('02')) {
+      // Seoul: 02-XXXX-XXXX
+      if (digits.length === 10) {
+        return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`
+      } else if (digits.length === 9) {
+        return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`
+      }
+    } else if (digits.startsWith('01')) {
+      // Mobile: 01X-XXXX-XXXX or 01X-XXX-XXXX
+      if (digits.length === 11) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+      } else if (digits.length === 10) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`
+      }
+    } else if (/^0[3-6]/.test(digits)) {
+      // Area code: 0XX-XXXX-XXXX
+      if (digits.length === 11) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+      } else if (digits.length === 10) {
+        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`
+      }
+    }
+
+    return phone
+  },
+
+  /**
+   * @description Format Korean business registration number
+   * @param brn Business registration number
+   * @returns Formatted business number (XXX-XX-XXXXX)
+   */
+  formatBusinessNumber: (brn: string): string => {
+    const digits = brn.replace(/[^0-9]/g, '')
+
+    if (digits.length !== 10) {
+      return brn
+    }
+
+    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`
   }
 }
 export default util

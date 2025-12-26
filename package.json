@@ -1,7 +1,7 @@
 {
   "name": "jell-utils",
-  "version": "0.1.0",
-  "description": "This is personal used function collection.",
+  "version": "0.2.0",
+  "description": "Korean-specialized TypeScript utility library with date, number, string, and validation utilities.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "author": "Jell <jellive7@gmail.com> (https://blog.jell.kr)",
@@ -15,7 +15,15 @@
     "string-manipulation",
     "date-formatting",
     "korean-language",
-    "browser-utilities"
+    "browser-utilities",
+    "date-utils",
+    "number-formatting",
+    "validation",
+    "korean-utils",
+    "file-size",
+    "currency-formatting",
+    "phone-number",
+    "business-number"
   ],
   "repository": {
     "type": "git",
