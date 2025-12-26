@@ -1,9 +1,36 @@
+# Source & Tests
 src
 __tests__
+
+# CI/CD
 .github
+.releaserc.json
+
+# Config files
 .eslintignore
 .eslintrc.js
 jestconfig.json
 tsconfig.json
 tslint.json
 .prettierrc
+
+# Editor & AI tools
+.claude/
+.cursor/
+.gemini/
+.taskmaster/
+.mcp.json
+CLAUDE.md
+
+# Coverage & Docs
+coverage/
+internal-docs/
+
+# Environment
+.env
+.env.example
+.env*.local
+
+# Misc
+*.tgz
+.DS_Store

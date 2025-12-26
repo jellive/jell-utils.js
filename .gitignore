@@ -167,4 +167,15 @@ dev-debug.log
 
 # Task files
 tasks.json
-tasks/ 
+tasks/
+
+# AI/Editor tools
+.claude/
+.cursor/
+.gemini/
+.taskmaster/
+.mcp.json
+.env.example
+
+# Internal docs
+internal-docs/
