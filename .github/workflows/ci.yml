@@ -123,7 +123,7 @@ jobs:
 
       - name: 📝 Semantic Release (Dry Run)
         id: semantic-release
-        if: ${{ secrets.NPM_TOKEN != '' }}
+        continue-on-error: true
         uses: cycjimmy/semantic-release-action@v4
         with:
           dry_run: true
@@ -134,7 +134,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: ⚠️ Skip Release Check
-        if: ${{ secrets.NPM_TOKEN == '' }}
-        run: echo "NPM_TOKEN not configured, skipping release check"
