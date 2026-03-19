@@ -1,0 +1,41 @@
+name: Mutation Testing
+
+on:
+  schedule:
+    # Sunday 3am KST = Saturday 18:00 UTC
+    - cron: '0 18 * * 6'
+  workflow_dispatch:
+
+jobs:
+  mutation:
+    name: Stryker Mutation Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Run Stryker Mutation Testing
+        run: npx stryker run
+        env:
+          CI: true
+
+      - name: Upload Mutation Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          retention-days: 30

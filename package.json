@@ -1,9 +1,62 @@
 {
   "name": "jell-utils",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Korean-specialized TypeScript utility library with date, number, string, and validation utilities.",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "import": "./dist/string.mjs",
+      "require": "./dist/string.js"
+    },
+    "./array": {
+      "types": "./dist/array.d.ts",
+      "import": "./dist/array.mjs",
+      "require": "./dist/array.js"
+    },
+    "./object": {
+      "types": "./dist/object.d.ts",
+      "import": "./dist/object.mjs",
+      "require": "./dist/object.js"
+    },
+    "./async": {
+      "types": "./dist/async.d.ts",
+      "import": "./dist/async.mjs",
+      "require": "./dist/async.js"
+    },
+    "./date": {
+      "types": "./dist/date.d.ts",
+      "import": "./dist/date.mjs",
+      "require": "./dist/date.js"
+    },
+    "./korean": {
+      "types": "./dist/korean.d.ts",
+      "import": "./dist/korean.mjs",
+      "require": "./dist/korean.js"
+    },
+    "./number": {
+      "types": "./dist/number.d.ts",
+      "import": "./dist/number.mjs",
+      "require": "./dist/number.js"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.mjs",
+      "require": "./dist/validation.js"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "import": "./dist/format.mjs",
+      "require": "./dist/format.js"
+    }
+  },
   "author": "Jell <jellive7@gmail.com> (https://blog.jell.kr)",
   "license": "MIT",
   "keywords": [
@@ -37,12 +90,16 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
+    "build:types": "tsc --emitDeclarationOnly",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest --config jestconfig.json",
     "test:coverage": "jest --config jestconfig.json --coverage",
+    "test:integration": "jest --config jestconfig.json --testPathPattern='__tests__/integration'",
+    "test:performance": "jest --config jestconfig.json --testPathPattern='__tests__/performance'",
+    "test:mutation": "npx stryker run",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "semantic-release": "semantic-release",
@@ -62,15 +119,19 @@
     "@semantic-release/github": "^9.2.1",
     "@semantic-release/npm": "^11.0.0",
     "@semantic-release/release-notes-generator": "^12.0.0",
+    "@stryker-mutator/core": "^9.6.0",
+    "@stryker-mutator/jest-runner": "^9.6.0",
     "@types/jest": "^29.5.5",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "eslint": "^8.50.0",
+    "fast-check": "^4.6.0",
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
     "semantic-release": "^22.0.5",
     "ts-jest": "^29.1.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.2.2"
   },
   "jest": {

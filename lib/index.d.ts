@@ -1,303 +1,108 @@
+/**
+ * jell-utils v1.0.0
+ * Korean-specialized TypeScript utility library
+ * Barrel export — re-exports all modules for backward compatibility.
+ *
+ * Usage:
+ *   import util from 'jell-utils'        // default object (v0.x compat)
+ *   import { truncate } from 'jell-utils' // named exports (v1.x)
+ *   import { truncate } from 'jell-utils/string' // subpath import (v1.x)
+ */
+export * from './string';
+export * from './array';
+export * from './object';
+export * from './async';
+export * from './date';
+export * from './korean';
+export * from './number';
+export { isEmail, isPhone, isPhoneNumber, isUrl, isUUID, formatPhoneNumber, formatBusinessNumber } from './validation';
+export { formatBytes, formatPercent } from './format';
+import * as stringUtils from './string';
+import * as arrayUtils from './array';
+import * as objectUtils from './object';
+import * as asyncUtils from './async';
+import * as dateUtils from './date';
+import * as koreanUtils from './korean';
+import * as numberUtils from './number';
+import * as validationUtils from './validation';
+import * as formatUtils from './format';
+/**
+ * Default export object — backward-compatible with v0.x `import util from 'jell-utils'`
+ * All original function names are preserved.
+ */
 declare const util: {
-    /**
-     * @description return message is korean
-     * @param message target string.
-     * @returns boolean
-     */
-    isKorean: (message: string) => boolean;
-    /**
-     * @description return deep copied object by original object using structuredClone or JSON fallback.
-     * @param obj object to deep clone
-     * @returns deep cloned object
-     */
-    clone: <T>(obj: T) => T;
-    /**
-     * @description encode uri parsing (like &lt; => <, &gt; => >)
-     * @param txt Original string
-     * @returns tag parsed string
-     */
-    parseTag: (txt: string) => string;
-    /**
-     * @description parseNumber with defaultvalue and proper validation
-     * @param target original string to parse
-     * @param defaultValue return default value if parsing fails
-     * @param isFloat whether to parse as float or integer
-     * @returns parsed number value or default value
-     */
-    parseNumber: (target: string, defaultValue: number, isFloat?: boolean) => number;
-    /**
-     * @description parse time string to milliseconds
-     * @param target required format such as '00:11:22' (HH:MM:SS) or '11:22' (MM:SS)
-     * @param defaultValue default value if parsing fails
-     * @returns parsed milliseconds or default value
-     */
-    parseTime: (target: string, defaultValue: number) => number;
-    /**
-     * @description generate string from now time with datetime format.
-     * @returns string now datetime format
-     */
-    getNowDate: () => string;
-    /**
-     * @description generate string from inputed time with korean date format.
-     * @param dateString date input (Date object or string)
-     * @param isYear whether to include year in output
-     * @returns string korean date format
-     */
-    getKoreanDate: (dateString?: Date | string, isYear?: boolean) => string;
-    /**
-     * @description convert date to yyyy-mm-dd format string.
-     * @param date date formatted string.
-     * @returns yyyy-mm-dd formatted string.
-     */
-    formatDate: (date?: Date | string) => string;
-    /**
-     * @description calculate d-day with target date.
-     * @param date target date
-     * @returns d-day
-     */
-    calDDay: (date?: Date | string) => number;
-    /**
-     * @description replace word in str with index.
-     * @param str original string
-     * @param txt replace word
-     * @param startIndex slice first index
-     * @param endIndex slice last index
-     * @returns
-     */
-    replaceBetween: (str: string, txt: string, startIndex: number, endIndex: number) => string;
-    /**
-     * @description convert string to camelCase format
-     * @param txt input string to convert (supports snake_case and space-separated)
-     * @returns camelCase formatted string
-     */
-    toCamelCase: (txt: string) => string;
-    /**
-     * @description convert string to snake_case format
-     * @param txt input string to convert
-     * @returns snake_case formatted string
-     */
-    toSnakeCase: (txt: string) => string;
-    /**
-     * @description make title case string (first character capital and word space)
-     * @param txt input string to convert
-     * @returns title case string with proper spacing
-     */
-    toTitleCase: (txt: string) => string;
-    /**
-     * @description convert HTML br tags to line breaks
-     * @param txt input string with br tags
-     * @returns string with br tags converted to newlines
-     */
-    toText: (txt: string) => string;
-    /**
-     * @description convert line breaks to HTML br tags
-     * @param txt input string with newlines
-     * @returns string with newlines converted to br tags
-     */
-    toHtml: (txt: string) => string;
-    /**
-     * @description safely remove HTML tags from text, preventing XSS attacks
-     * @param txt input string with HTML tags
-     * @param preserveErrorTags whether to preserve elements with 'suggestCheck' class
-     * @returns sanitized text with specified tags removed
-     */
-    clearTag: (txt: string, preserveErrorTags?: boolean) => string;
-    /**
-     * @description check if two arrays are equal (shallow comparison)
-     * @param a first array to compare
-     * @param b second array to compare
-     * @returns true if arrays are equal, false otherwise
-     */
-    equalArrays: (a: unknown[], b: unknown[]) => boolean;
-    /**
-     * @description check iOS device client with user agent.
-     * @returns true if client is iOS device, false otherwise
-     */
-    isiOS: () => boolean;
-    /**
-     * @description validate Korean business registration number (사업자등록번호)
-     * @param businessNumber business registration number string (10 digits)
-     * @returns true if valid, false otherwise
-     */
-    isBusinessNumber: (businessNumber: string) => boolean;
-    /**
-     * @description get nested object value by path string
-     * @param obj target object
-     * @param path path string (e.g., 'user.profile.name')
-     * @param defaultValue default value if path not found
-     * @returns value at path or default value
-     */
-    getByPath: <T = unknown>(obj: Record<string, unknown>, path: string, defaultValue?: T) => T;
-    /**
-     * @description set nested object value by path string
-     * @param obj target object
-     * @param path path string (e.g., 'user.profile.name')
-     * @param value value to set
-     */
-    setByPath: (obj: Record<string, unknown>, path: string, value: unknown) => void;
-    /**
-     * @description group array of objects by key
-     * @param array array to group
-     * @param key key to group by
-     * @returns grouped object
-     */
-    groupBy: <T extends Record<string, unknown>>(array: T[], key: keyof T) => Record<string, T[]>;
-    /**
-     * @description extract only numbers from string
-     * @param str input string
-     * @returns string containing only numbers
-     */
-    extractNumbers: (str: string) => string;
-    /**
-     * @description get file extension from filename or path
-     * @param filename filename or path
-     * @returns file extension without dot (e.g., 'jpg', 'pdf')
-     */
-    getFileExtension: (filename: string) => string;
-    /**
-     * @description calculate difference between two dates
-     * @param date1 first date
-     * @param date2 second date
-     * @returns object with days, hours, minutes, seconds difference
-     */
-    dateDiff: (date1: Date | string, date2?: Date | string) => {
-        days: number;
-        hours: number;
-        minutes: number;
-        seconds: number;
-    };
-    /**
-     * @description deep merge two objects
-     * @param target target object
-     * @param source source object
-     * @returns merged object
-     */
-    deepMerge: <T extends Record<string, unknown>>(target: T, source: Partial<T>) => T;
-    /**
-     * @description retry async function with exponential backoff
-     * @param fn async function to retry
-     * @param maxRetries maximum number of retries
-     * @param delay initial delay in milliseconds
-     * @returns promise with function result
-     */
-    retry: <T>(fn: () => Promise<T>, maxRetries?: number, delay?: number) => Promise<T>;
-    /**
-     * @description search Korean string by chosung (초성)
-     * @param str target string to search in
-     * @param search chosung search string
-     * @returns true if chosung matches
-     */
-    chosungSearch: (str: string, search: string) => boolean;
-    /**
-     * @description sort array of objects by key
-     * @param array array to sort
-     * @param key key to sort by
-     * @param order sort order ('asc' or 'desc')
-     * @returns sorted array
-     */
-    sortBy: <T extends Record<string, unknown>>(array: T[], key: keyof T, order?: "asc" | "desc") => T[];
-    /**
-     * @description convert object to URL query string
-     * @param obj object to convert
-     * @returns query string (e.g., 'key1=value1&key2=value2')
-     */
-    objectToQueryString: (obj: Record<string, unknown>) => string;
-    /**
-     * @description mask sensitive string (e.g., credit card, phone)
-     * @param str string to mask
-     * @param visibleStart number of visible characters at start
-     * @param visibleEnd number of visible characters at end
-     * @param maskChar character to use for masking
-     * @returns masked string
-     */
-    maskString: (str: string, visibleStart?: number, visibleEnd?: number, maskChar?: string) => string;
-    /**
-     * @description Format date with custom format tokens
-     * @param date Date object or date string
-     * @param format Format string with tokens (YYYY, MM, DD, HH, mm, ss, ddd, dddd)
-     * @returns Formatted date string
-     */
-    formatDateAdvanced: (date: Date | string, format: string) => string;
-    /**
-     * @description Get relative time string in Korean
-     * @param date Date object or date string
-     * @returns Korean relative time string (e.g., '방금 전', '5분 전', '어제')
-     */
-    timeAgo: (date: Date | string) => string;
-    /**
-     * @description Get the number of days in a month
-     * @param year Year (e.g., 2025)
-     * @param month Month (1-12)
-     * @returns Number of days in the month
-     */
-    getDaysInMonth: (year: number, month: number) => number;
-    /**
-     * @description Check if a year is a leap year
-     * @param year Year to check
-     * @returns true if leap year, false otherwise
-     */
-    isLeapYear: (year: number) => boolean;
-    /**
-     * @description Format number with thousand separators
-     * @param num Number to format
-     * @returns Formatted string with commas
-     */
-    formatNumber: (num: number) => string;
-    /**
-     * @description Format number as currency
-     * @param amount Amount to format
-     * @param currency Currency code (KRW, USD, EUR, JPY, CNY)
-     * @returns Formatted currency string
-     */
-    formatCurrency: (amount: number, currency?: "KRW" | "USD" | "EUR" | "JPY" | "CNY") => string;
-    /**
-     * @description Format bytes to human-readable file size
-     * @param bytes Number of bytes
-     * @param precision Decimal precision (default: 0 for B/KB, 2 for larger)
-     * @returns Formatted file size string
-     */
-    formatFileSize: (bytes: number, precision?: number) => string;
-    /**
-     * @description Convert number to Korean words
-     * @param num Number to convert
-     * @returns Korean number string (e.g., '천이백삼십사')
-     */
-    numberToKorean: (num: number) => string;
-    /**
-     * @description Parse number from formatted string
-     * @param str String containing number (with commas, currency symbols, etc.)
-     * @returns Parsed number
-     */
-    parseNumberFromString: (str: string) => number;
-    /**
-     * @description Validate email address
-     * @param email Email address to validate
-     * @returns true if valid email, false otherwise
-     */
-    isEmail: (email: string) => boolean;
-    /**
-     * @description Validate Korean phone number
-     * @param phone Phone number to validate
-     * @returns true if valid Korean phone number, false otherwise
-     */
-    isPhoneNumber: (phone: string) => boolean;
-    /**
-     * @description Validate URL
-     * @param url URL to validate
-     * @returns true if valid URL, false otherwise
-     */
-    isUrl: (url: string) => boolean;
-    /**
-     * @description Format Korean phone number with hyphens
-     * @param phone Phone number to format
-     * @returns Formatted phone number
-     */
-    formatPhoneNumber: (phone: string) => string;
-    /**
-     * @description Format Korean business registration number
-     * @param brn Business registration number
-     * @returns Formatted business number (XXX-XX-XXXXX)
-     */
-    formatBusinessNumber: (brn: string) => string;
+    parseTag: typeof stringUtils.parseTag;
+    toCamelCase: typeof stringUtils.toCamelCase;
+    toSnakeCase: typeof stringUtils.toSnakeCase;
+    toTitleCase: typeof stringUtils.toTitleCase;
+    toText: typeof stringUtils.toText;
+    toHtml: typeof stringUtils.toHtml;
+    clearTag: typeof stringUtils.clearTag;
+    replaceBetween: typeof stringUtils.replaceBetween;
+    extractNumbers: typeof stringUtils.extractNumbers;
+    getFileExtension: typeof stringUtils.getFileExtension;
+    maskString: typeof stringUtils.maskString;
+    objectToQueryString: typeof stringUtils.objectToQueryString;
+    truncate: typeof stringUtils.truncate;
+    slugify: typeof stringUtils.slugify;
+    camelToKebab: typeof stringUtils.camelToKebab;
+    kebabToCamel: typeof stringUtils.kebabToCamel;
+    maskEmail: typeof stringUtils.maskEmail;
+    maskPhone: typeof stringUtils.maskPhone;
+    equalArrays: typeof arrayUtils.equalArrays;
+    groupBy: typeof arrayUtils.groupBy;
+    sortBy: typeof arrayUtils.sortBy;
+    chunk: typeof arrayUtils.chunk;
+    unique: typeof arrayUtils.unique;
+    shuffle: typeof arrayUtils.shuffle;
+    flatten: typeof arrayUtils.flatten;
+    clone: typeof objectUtils.clone;
+    getByPath: typeof objectUtils.getByPath;
+    setByPath: typeof objectUtils.setByPath;
+    deepMerge: typeof objectUtils.deepMerge;
+    pick: typeof objectUtils.pick;
+    omit: typeof objectUtils.omit;
+    diff: typeof objectUtils.diff;
+    isEmpty: typeof objectUtils.isEmpty;
+    retry: typeof asyncUtils.retry;
+    timeout: typeof asyncUtils.timeout;
+    parallel: typeof asyncUtils.parallel;
+    serial: typeof asyncUtils.serial;
+    getNowDate: typeof dateUtils.getNowDate;
+    getKoreanDate: typeof dateUtils.getKoreanDate;
+    formatDate: typeof dateUtils.formatDate;
+    calDDay: typeof dateUtils.calDDay;
+    dateDiff: typeof dateUtils.dateDiff;
+    formatDateAdvanced: typeof dateUtils.formatDateAdvanced;
+    timeAgo: typeof dateUtils.timeAgo;
+    getDaysInMonth: typeof dateUtils.getDaysInMonth;
+    isLeapYear: typeof dateUtils.isLeapYear;
+    relative: typeof dateUtils.relative;
+    isWeekend: typeof dateUtils.isWeekend;
+    addDays: typeof dateUtils.addDays;
+    diffDays: typeof dateUtils.diffDays;
+    isKorean: typeof koreanUtils.isKorean;
+    chosungSearch: typeof koreanUtils.chosungSearch;
+    getChosung: typeof koreanUtils.getChosung;
+    withEunNeun: typeof koreanUtils.withEunNeun;
+    withIGa: typeof koreanUtils.withIGa;
+    withEulReul: typeof koreanUtils.withEulReul;
+    parseNumber: typeof numberUtils.parseNumber;
+    parseTime: typeof numberUtils.parseTime;
+    formatNumber: typeof numberUtils.formatNumber;
+    formatCurrency: typeof numberUtils.formatCurrency;
+    formatFileSize: typeof numberUtils.formatFileSize;
+    numberToKorean: typeof numberUtils.numberToKorean;
+    parseNumberFromString: typeof numberUtils.parseNumberFromString;
+    isBusinessNumber: typeof validationUtils.isBusinessNumber;
+    isEmail: typeof validationUtils.isEmail;
+    isPhoneNumber: typeof validationUtils.isPhoneNumber;
+    isPhone: typeof validationUtils.isPhone;
+    isUrl: typeof validationUtils.isUrl;
+    isUUID: typeof validationUtils.isUUID;
+    formatPhoneNumber: typeof validationUtils.formatPhoneNumber;
+    formatBusinessNumber: typeof validationUtils.formatBusinessNumber;
+    formatBytes: typeof formatUtils.formatBytes;
+    formatPercent: typeof formatUtils.formatPercent;
 };
 export default util;

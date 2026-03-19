@@ -1,4 +1,4 @@
-import util from '../lib'
+import util from '../dist'
 
 describe('Validation Utilities', () => {
   describe('isEmail', () => {
@@ -112,6 +112,28 @@ describe('Validation Utilities', () => {
 
     test('should return original for invalid length', () => {
       expect(util.formatBusinessNumber('12345')).toBe('12345')
+    })
+  })
+
+  describe('null/undefined guards', () => {
+    test('should return false for null input to isEmail', () => {
+      expect(util.isEmail(null as any)).toBe(false)
+    })
+
+    test('should return false for undefined input to isEmail', () => {
+      expect(util.isEmail(undefined as any)).toBe(false)
+    })
+
+    test('should return false for null input to isPhone', () => {
+      expect(util.isPhone(null as any)).toBe(false)
+    })
+
+    test('should return false for null input to isUrl', () => {
+      expect(util.isUrl(null as any)).toBe(false)
+    })
+
+    test('should return false for null input to isUUID', () => {
+      expect(util.isUUID(null as any)).toBe(false)
     })
   })
 })

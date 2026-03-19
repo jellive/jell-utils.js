@@ -1,4 +1,4 @@
-import util from '../lib'
+import util from '../dist'
 
 describe('Korean Utilities', () => {
   describe('isKorean', () => {

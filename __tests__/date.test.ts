@@ -1,4 +1,4 @@
-import util from '../lib'
+import util from '../dist'
 
 describe('Date Utilities', () => {
   describe('getNowDate', () => {
@@ -156,6 +156,37 @@ describe('Date Utilities', () => {
 
     test('should return false for century year not divisible by 400', () => {
       expect(util.isLeapYear(1900)).toBe(false)
+    })
+  })
+
+  describe('null/invalid input guards', () => {
+    test('should return empty string for null input to getKoreanDate', () => {
+      expect(util.getKoreanDate(null as any)).toBe('')
+    })
+
+    test('should return empty string for invalid date string to getKoreanDate', () => {
+      expect(util.getKoreanDate('not-a-date')).toBe('')
+    })
+
+    test('should return false for null input to isWeekend', () => {
+      expect(util.isWeekend(null as any)).toBe(false)
+    })
+
+    test('should return false for invalid date string to isWeekend', () => {
+      expect(util.isWeekend('not-a-date')).toBe(false)
+    })
+
+    test('should return invalid Date for null input to addDays', () => {
+      const result = util.addDays(null as any, 1)
+      expect(isNaN(result.getTime())).toBe(true)
+    })
+
+    test('should return NaN for null input to diffDays', () => {
+      expect(util.diffDays(null as any)).toBeNaN()
+    })
+
+    test('should return NaN for invalid date string to diffDays', () => {
+      expect(util.diffDays('not-a-date')).toBeNaN()
     })
   })
 })

@@ -1,4 +1,4 @@
-import util from '../lib'
+import util from '../dist'
 
 describe('Array Utilities', () => {
   describe('groupBy', () => {
@@ -56,6 +56,38 @@ describe('Array Utilities', () => {
 
     test('should return false for different lengths', () => {
       expect(util.equalArrays([1, 2], [1, 2, 3])).toBe(false)
+    })
+
+    test('should return false when either argument is null', () => {
+      expect(util.equalArrays(null as any, [1, 2, 3])).toBe(false)
+      expect(util.equalArrays([1, 2, 3], null as any)).toBe(false)
+      expect(util.equalArrays(null as any, null as any)).toBe(false)
+    })
+  })
+
+  describe('null/undefined guards', () => {
+    test('should handle null input for groupBy', () => {
+      expect(util.groupBy(null as any, 'key')).toEqual({})
+    })
+
+    test('should handle null input for sortBy', () => {
+      expect(util.sortBy(null as any, 'key')).toEqual([])
+    })
+
+    test('should handle null input for unique', () => {
+      expect(util.unique(null as any)).toEqual([])
+    })
+
+    test('should handle null input for shuffle', () => {
+      expect(util.shuffle(null as any)).toEqual([])
+    })
+
+    test('should handle null input for flatten', () => {
+      expect(util.flatten(null as any)).toEqual([])
+    })
+
+    test('should handle null input for chunk', () => {
+      expect(util.chunk(null as any, 2)).toEqual([])
     })
   })
 })
