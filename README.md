@@ -133,6 +133,42 @@ util.chosungSearch('김철수', 'ㄱㅊㅅ') // true
 util.chosungSearch('바나나', 'ㅅㄱ')   // false
 ```
 
+#### `getChosung(char: string): string`
+
+단일 한글 문자의 초성을 반환합니다. 한글이 아닌 문자는 그대로 반환합니다.
+
+```typescript
+util.getChosung('가') // 'ㄱ'
+util.getChosung('A')  // 'A'
+```
+
+#### `withEunNeun(word: string): string`
+
+마지막 음절의 받침 유무에 따라 올바른 주격 조사(`은`/`는`)를 붙입니다.
+
+```typescript
+util.withEunNeun('밥') // '밥은'
+util.withEunNeun('나') // '나는'
+```
+
+#### `withIGa(word: string): string`
+
+받침 유무에 따라 올바른 주격 조사(`이`/`가`)를 붙입니다.
+
+```typescript
+util.withIGa('밥') // '밥이'
+util.withIGa('나') // '나가'
+```
+
+#### `withEulReul(word: string): string`
+
+받침 유무에 따라 올바른 목적격 조사(`을`/`를`)를 붙입니다.
+
+```typescript
+util.withEulReul('밥') // '밥을'
+util.withEulReul('나') // '나를'
+```
+
 ---
 
 ### Date Utilities (날짜 유틸리티)
@@ -195,17 +231,24 @@ util.isLeapYear(1900) // false
 
 | Function | Description | Example |
 |---|---|---|
+| `truncate(str, maxLength, suffix?)` | Truncate string with suffix (default `'...'`) | `'hello world', 8` → `'hello...'` |
+| `slugify(str)` | Convert to URL-safe slug | `'Hello World!'` → `'hello-world'` |
 | `toCamelCase(txt)` | Convert to camelCase | `'hello_world'` → `'helloWorld'` |
 | `toSnakeCase(txt)` | Convert to snake_case | `'Hello World'` → `'hello_world'` |
 | `toTitleCase(txt)` | Convert to Title Case | `'helloWorld'` → `'Hello World'` |
+| `camelToKebab(str)` | Convert camelCase to kebab-case | `'helloWorld'` → `'hello-world'` |
+| `kebabToCamel(str)` | Convert kebab-case to camelCase | `'hello-world'` → `'helloWorld'` |
+| `maskEmail(email)` | Mask email local part | `'test@example.com'` → `'te**@example.com'` |
+| `maskPhone(phone)` | Mask phone middle digits | `'01012345678'` → `'010-****-5678'` |
+| `maskString(str, start?, end?, char?)` | Mask sensitive data | `'01012345678', 3, 4` → `'010****5678'` |
 | `parseTag(txt)` | Parse HTML entities | `'&lt;div&gt;'` → `'<div>'` |
 | `toText(txt)` | `<br>` → `\n` | `'a<br>b'` → `'a\nb'` |
 | `toHtml(txt)` | `\n` → `<br>` | `'a\nb'` → `'a<br>b'` |
 | `clearTag(txt)` | Strip HTML tags | `'<div>text</div>'` → `'text'` |
 | `extractNumbers(str)` | Extract digits only | `'010-1234'` → `'0101234'` |
-| `maskString(str, start?, end?, char?)` | Mask sensitive data | `'01012345678', 3, 4` → `'010****5678'` |
 | `getFileExtension(filename)` | Get file extension | `'image.JPG'` → `'jpg'` |
 | `replaceBetween(str, txt, start, end)` | Replace substring range | `'hello world', 'XXX', 6, 11` → `'hello XXX'` |
+| `objectToQueryString(obj)` | Serialize object to query string | `{ page: 1, size: 20 }` → `'page=1&size=20'` |
 
 ---
 
@@ -264,7 +307,10 @@ util.parseNumberFromString('1,000원')  // 1000
 | `getByPath(obj, path, default?)` | Get nested value by dot-path |
 | `setByPath(obj, path, value)` | Set nested value by dot-path |
 | `deepMerge(target, source)` | Deep merge two objects |
-| `objectToQueryString(obj)` | Object → URL query string |
+| `pick(obj, keys)` | Return new object with only specified keys |
+| `omit(obj, keys)` | Return new object without specified keys |
+| `diff(base, compare)` | Return keys that differ between two objects |
+| `isEmpty(value)` | Check if value is empty (null, `''`, `[]`, `{}`) |
 
 ```typescript
 const obj = { user: { profile: { name: 'Jell' } } }
@@ -281,10 +327,18 @@ util.getByPath(obj, 'user.age', 0)       // 0 (default)
 | `equalArrays(a, b)` | Shallow array equality check |
 | `groupBy<T>(array, key)` | Group array by key |
 | `sortBy<T>(array, key, order?)` | Sort array by key (`'asc'` or `'desc'`) |
+| `chunk<T>(array, size)` | Split array into fixed-size chunks |
+| `unique<T>(array)` | Remove duplicate values (preserves order) |
+| `flatten<T>(array, depth?)` | Flatten nested array (default depth: 1) |
+| `shuffle<T>(array)` | Randomly shuffle array (Fisher-Yates, non-mutating) |
 
 ```typescript
 util.groupBy(items, 'category')         // { fruit: [...], vegetable: [...] }
 util.sortBy(items, 'age', 'asc')        // sorted by age ascending
+util.chunk([1,2,3,4,5], 2)             // [[1,2],[3,4],[5]]
+util.unique([1,1,2,3,3])               // [1,2,3]
+util.flatten([[1,2],[3,[4]]])           // [1,2,3,[4]]
+util.shuffle([1,2,3,4,5])              // [3,1,5,2,4] (random)
 ```
 
 ---
@@ -297,6 +351,33 @@ Exponential backoff retry for failed async operations.
 
 ```typescript
 await util.retry(fetchData, 3, 1000) // up to 3 retries, 1s initial delay
+await util.retry(fetchData, { maxRetries: 5, delay: 500, backoff: 2, maxDelay: 30000 })
+```
+
+#### `timeout<T>(promise, ms, message?): Promise<T>`
+
+Wraps a promise with a timeout — rejects if not resolved within `ms`.
+
+```typescript
+await util.timeout(fetch('/api'), 5000)              // rejects after 5s
+await util.timeout(fetch('/api'), 5000, 'API timeout') // custom error message
+```
+
+#### `parallel<T>(fns, concurrency?): Promise<T[]>`
+
+Run async functions in parallel with an optional concurrency limit.
+
+```typescript
+await util.parallel([fetchA, fetchB, fetchC])       // all at once
+await util.parallel([fetchA, fetchB, fetchC], 2)    // max 2 at a time
+```
+
+#### `serial<T>(fns): Promise<T[]>`
+
+Run async functions one after another, in order.
+
+```typescript
+await util.serial([stepOne, stepTwo, stepThree])    // sequential
 ```
 
 ---
@@ -306,10 +387,13 @@ await util.retry(fetchData, 3, 1000) // up to 3 retries, 1s initial delay
 | Function | Description | Example |
 |---|---|---|
 | `isEmail(email)` | Validate email format | `'test@example.com'` → `true` |
-| `isPhoneNumber(phone)` | Validate Korean phone number | `'010-1234-5678'` → `true` |
-| `isUrl(url)` | Validate URL | `'https://example.com'` → `true` |
-| `formatPhoneNumber(phone)` | Format with hyphens | `'01012345678'` → `'010-1234-5678'` |
-| `formatBusinessNumber(brn)` | Format business reg. number | `'1234567890'` → `'123-45-67890'` |
+| `isPhone(phone)` | Validate Korean mobile or landline number | `'010-1234-5678'` → `true` |
+| `isPhoneNumber(phone)` | Alias for `isPhone` | `'02-123-4567'` → `true` |
+| `isUrl(url)` | Validate http/https/ftp URL | `'https://example.com'` → `true` |
+| `isUUID(uuid)` | Validate UUID v1-v5 | `'550e8400-...'` → `true` |
+| `isBusinessNumber(brn)` | Validate Korean business registration number | `'1018626554'` → `true` |
+| `formatPhoneNumber(phone)` | Format phone number with hyphens | `'01012345678'` → `'010-1234-5678'` |
+| `formatBusinessNumber(brn)` | Format business registration number | `'1234567890'` → `'123-45-67890'` |
 
 ### Browser Utilities
 
